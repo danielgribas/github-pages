@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CV Interativo - Daniel Gotlieb Ribas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        html { scroll-behavior: smooth; scroll-padding-top: 60px; /* Adjust based on header height */ }
+        body { font-family: 'Inter', sans-serif; background-color: #111827; color: #e5e7eb; } /* bg-gray-900, text-gray-200 */
+        
+        /* Language Modal Styles */
+        .language-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .language-modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .language-modal-content {
+            background-color: #1f2937; /* bg-gray-800 */
+            padding: 2rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            text-align: center;
+            border: 1px solid #374151; /* border-gray-700 */
+        }
+        .language-modal-content h2 {
+            color: #60a5fa; /* text-blue-400 */
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+        }
+        .language-modal-content button {
+            background-color: #2563eb; /* bg-blue-600 */
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            margin: 0.5rem;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-size: 1rem;
+        }
+        .language-modal-content button:hover {
+            background-color: #1d4ed8; /* bg-blue-700 */
+        }
+
+        /* General Styles from previous version */
+        .nav-link { transition: color 0.3s ease; }
+        .nav-link:hover, .nav-link.active { color: #3b82f6; } /* hover:text-blue-500 */
+        .section-title { color: #60a5fa; border-bottom: 2px solid #3b82f6; padding-bottom: 0.5rem; } /* text-blue-400, border-blue-500 */
+        .timeline-item { border-left: 3px solid #4b5563; padding-left: 1.5rem; position: relative; margin-bottom: 2rem; } /* border-gray-600 */
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -0.5625rem; /* Adjusted for 3px border */
+            top: 0.25rem;
+            width: 1rem;
+            height: 1rem;
+            border-radius: 9999px;
+            background-color: #3b82f6; /* bg-blue-500 */
+            border: 3px solid #111827; /* border-gray-900 */
+        }
+        .skill-bar-container { background-color: #374151; border-radius: 0.375rem; overflow: hidden; height: 1.25rem;} /* bg-gray-700 */
+        .skill-bar { background-color: #2563eb; height: 100%; text-align: center; padding-right: 0.5rem; color: white; font-size: 0.75rem; line-height: 1.25rem; transition: width 0.5s ease-in-out; display: flex; align-items: center; justify-content: center;} /* bg-blue-600 */
+        .card { background-color: #1f2937; border: 1px solid #374151; box-shadow: 0 1px 3px 0 rgba(0,0,0,0.1), 0 1px 2px 0 rgba(0,0,0,0.06); } /* bg-gray-800, border-gray-700 */
+        .highlight-achievement { background-color: #1e3a8a; border-left: 4px solid #3b82f6; padding: 0.75rem; margin-top: 0.75rem; font-style: italic; color: #bfdbfe; border-radius: 0.25rem; } /* bg-blue-800 (darker blue), border-blue-500, text-blue-200 */
+        .icon-placeholder { display: inline-block; width: 1.2em; height: 1.2em; text-align: center; vertical-align: middle; }
+        .text-primary-accent { color: #3b82f6; } /* text-blue-500 */
+        .text-secondary-accent { color: #60a5fa; } /* text-blue-400 */
+        .bg-header-footer { background-color: #1f2937; } /* bg-gray-800 */
+        .border-separator { border-color: #374151; } /* border-gray-700 */
+        .text-muted { color: #9ca3af; } /* text-gray-400 */
+        .text-strong { color: #d1d5db; } /* text-gray-300 */
+        .text-title-main { color: #60a5fa; } /* text-blue-400 */
+        .text-title-sub { color: #93c5fd; } /* text-blue-300 */
+
+        #main-cv-content {
+            display: none; /* Initially hidden */
+        }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="antialiased">
+
+    <div id="language-modal-overlay" class="language-modal-overlay">
+        <div class="language-modal-content">
+            <h2 data-lang-key="modalTitle">Select Your Language</h2>
+            <div>
+                <button data-lang="en">English</button>
+                <button data-lang="pt">Português (Portugal)</button>
+                <button data-lang="es">Español</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="main-cv-content">
+        <header class="bg-header-footer shadow-md sticky top-0 z-50">
+            <nav class="container mx-auto px-4 sm:px-6 py-3 flex justify-between items-center">
+                <a href="#perfil" class="text-xl sm:text-2xl font-bold text-title-main" data-lang-key="headerName">Daniel Gotlieb Ribas</a>
+                <div class="hidden md:flex space-x-4">
+                    <a href="#perfil" class="text-gray-300 nav-link" data-lang-key="navProfile">Perfil</a>
+                    <a href="#experiencia" class="text-gray-300 nav-link" data-lang-key="navExperience">Experiência</a>
+                    <a href="#formacao" class="text-gray-300 nav-link" data-lang-key="navEducation">Formação</a>
+                    <a href="#competencias" class="text-gray-300 nav-link" data-lang-key="navSkills">Competências</a>
+                    <a href="#contacto" class="text-gray-300 nav-link" data-lang-key="navContact">Contacto</a>
+                </div>
+                <div class="md:hidden">
+                    <button id="mobile-menu-button" class="text-gray-300 focus:outline-none">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                    </button>
+                </div>
+            </nav>
+            <div id="mobile-menu" class="md:hidden hidden bg-header-footer shadow-lg">
+                <a href="#perfil" class="block py-2 px-4 text-sm text-gray-300 nav-link hover:bg-gray-700" data-lang-key="navProfileMobile">Perfil</a>
+                <a href="#experiencia" class="block py-2 px-4 text-sm text-gray-300 nav-link hover:bg-gray-700" data-lang-key="navExperienceMobile">Experiência</a>
+                <a href="#formacao" class="block py-2 px-4 text-sm text-gray-300 nav-link hover:bg-gray-700" data-lang-key="navEducationMobile">Formação</a>
+                <a href="#competencias" class="block py-2 px-4 text-sm text-gray-300 nav-link hover:bg-gray-700" data-lang-key="navSkillsMobile">Competências</a>
+                <a href="#contacto" class="block py-2 px-4 text-sm text-gray-300 nav-link hover:bg-gray-700" data-lang-key="navContactMobile">Contacto</a>
+            </div>
+        </header>
+
+        <main class="container mx-auto px-4 sm:px-6 py-8">
+
+            <section id="perfil" class="mb-12 sm:mb-16 pt-16 -mt-16">
+                <div class="text-center mb-8">
+                    <h1 class="text-4xl sm:text-5xl font-bold text-title-main" data-lang-key="mainTitleName">DANIEL GOTLIEB RIBAS</h1>
+                    <p class="text-xl sm:text-2xl text-title-sub mt-2" data-lang-key="mainTitleRole">Especialista em Marketing Digital</p>
+                </div>
+                <div class="card p-6 md:p-8 rounded-lg">
+                    <h2 class="text-2xl font-semibold section-title mb-4" data-lang-key="profileSectionTitle">Perfil Profissional</h2>
+                    <p class="text-gray-300 leading-relaxed text-justify" data-lang-key="profileSummary">
+                        Com experiência consolidada em diversos setores da indústria, sou especialista na criação e planeamento estratégico de media, gestão de campanhas multicanal e na elaboração de relatórios e apresentações de performance. Possuo competências comprovadas em plataformas de publicidade social (Meta Ads, TikTok Ads, LinkedIn Ads), display (Google Display Network), vídeo (YouTube Ads), compra de TV programática e tradicional, e otimização para motores de busca (SEO/SEM). Sou proficiente na otimização de resultados com foco em ROI e na criação de processos eficientes, tanto para equipas internas como para clientes. Como líder, destaco-me pela capacidade de delegação eficaz e desenvolvimento de equipas. Ao longo da minha carreira, tenho consistentemente superado as metas e objetivos dos clientes.
+                    </p>
+                </div>
+            </section>
+
+            <section id="experiencia" class="mb-12 sm:mb-16 pt-16 -mt-16">
+                <h2 class="text-3xl font-bold section-title mb-8" data-lang-key="experienceSectionTitle">Experiência Profissional</h2>
+                <div class="space-y-8">
+                    
+                    <article class="timeline-item">
+                        <h3 class="text-xl font-semibold text-secondary-accent" data-lang-key="exp1Title">Digital Media Supervisor</h3>
+                        <p class="text-md font-medium text-gray-400" data-lang-key="exp1Company">KINESSO (IPG MEDIABRANDS) | Lisboa, Portugal (Híbrido)</p>
+                        <p class="text-sm text-gray-500 mb-2" data-lang-key="exp1Date">Outubro 2024 – Presente (Aprox. 8 meses à data de Maio 2025)</p>
+                        <p class="text-gray-300 mb-2" data-lang-key="exp1Description">Liderança de uma equipa de executivos de campanha, impulsionando o sucesso digital para um portfólio diversificado de clientes de renome, incluindo Super Bock Group, Intermarché, Bricomarché, Roady, H&M e Amazon.</p>
+                        <strong class="text-gray-300" data-lang-key="expKeyResponsibilities">Principais Responsabilidades:</strong>
+                        <ul class="list-disc list-inside text-gray-300 space-y-1 mt-1">
+                            <li data-lang-key="exp1Resp1">**Planeamento Estratégico:** Desenvolvimento e implementação de estratégias digitais inovadoras para alcançar os objetivos dos clientes e maximizar o ROI.</li>
+                            <li data-lang-key="exp1Resp2">**Gestão de Relacionamento com o Cliente:** Cultivo de relações sólidas com stakeholders chave, fornecendo aconselhamento estratégico e identificando novas oportunidades de negócio.</li>
+                            <li data-lang-key="exp1Resp3">**Liderança de Equipa:** Mentoria e orientação de uma equipa de alta performance, fomentando um ambiente colaborativo e orientado para resultados.</li>
+                            <li data-lang-key="exp1Resp4">**Otimização de Performance:** Análise do desempenho de campanhas, identificação de áreas de melhoria e implementação de estratégias de otimização para aumentar a eficiência e eficácia.</li>
+                            <li data-lang-key="exp1Resp5">**Gestão Financeira:** Supervisão da faturação dos clientes e garantia da precisão dos relatórios financeiros.</li>
+                        </ul>
+                        <div class="highlight-achievement">
+                            <p><em data-lang-key="exp1Achievement">Exemplo de Conquista (Adicionar se aplicável): Implementação de novas estratégias de segmentação que resultaram num aumento de X% no CTR e redução de Y% no CPA para o cliente Z.</em></p>
+                        </div>
+                    </article>
+
+                    <article class="timeline-item">
+                        <h3 class="text-xl font-semibold text-secondary-accent" data-lang-key="exp2Title">Marketplaces Specialist</h3>
+                        <p class="text-md font-medium text-gray-400" data-lang-key="exp2Company">Quartile | New York, USA (Remoto)</p>
+                        <p class="text-sm text-gray-500 mb-2" data-lang-key="exp2Date">Maio 2024 – Outubro 2024 (6 meses)</p>
+                        <ul class="list-disc list-inside text-gray-300 space-y-1">
+                            <li data-lang-key="exp2Resp1">Otimização de campanhas em marketplaces como Walmart Ads e Instacart Ads para clientes de retalho nos EUA, utilizando uma abordagem orientada por dados e expertise em IA para alcançar o máximo ROAS e rentabilidade.</li>
+                            <li data-lang-key="exp2Resp2">Desenvolvimento e implementação de estratégias para impulsionar campanhas publicitárias de sucesso.</li>
+                            <li data-lang-key="exp2Resp3">Utilização de competências analíticas para acompanhar e medir o desempenho das campanhas.</li>
+                            <li data-lang-key="exp2Resp4">Colaboração com equipas multifuncionais para garantir o sucesso das campanhas.</li>
+                        </ul>
+                        <div class="highlight-achievement">
+                            <p><em data-lang-key="exp2Achievement">Exemplo de Conquista (Adicionar se aplicável): Alcancei uma melhoria média de X% no Retorno Sobre o Investimento Publicitário (ROAS) para clientes da categoria Y.</em></p>
+                        </div>
+                    </article>
+                    
+                    <article class="timeline-item">
+                        <h3 class="text-xl font-semibold text-secondary-accent" data-lang-key="exp3Title">Media Supervisor (Cliente: Amazon Prime Video)</h3>
+                        <p class="text-md font-medium text-gray-400" data-lang-key="exp3Company">Mediabrands Brasil (RUFUS) | São Paulo, Brasil (Híbrido)</p>
+                        <p class="text-sm text-gray-500 mb-2" data-lang-key="exp3Date">Novembro 2022 – Maio 2024 (1 ano e 7 meses)</p>
+                        <ul class="list-disc list-inside text-gray-300 space-y-1">
+                            <li data-lang-key="exp3Resp1">Liderei uma equipa de um coordenador e um assistente, supervisionando a execução tática das campanhas.</li>
+                            <li data-lang-key="exp3Resp2">Monitorização diária do desempenho de campanhas em Google Ads, Facebook Ads, Twitter Ads, TikTok Ads.</li>
+                            <li data-lang-key="exp3Resp3">Preparação de relatórios de desempenho de campanhas, com sugestões de otimização, gestão e distribuição de investimento.</li>
+                            <li data-lang-key="exp3Resp4">Criação, implementação e reporte de novos planos de media.</li>
+                            <li data-lang-key="exp3Resp5">Controlo de faturação e emissão de PI/AP no sistema AdSolutions.</li>
+                            <li data-lang-key="exp3Resp6">Participação em reuniões com veículos Digitais, OOH e TV.</li>
+                            <li data-lang-key="exp3Resp7">Comunicação direta com o cliente para apresentação de planos e relatórios.</li>
+                        </ul>
+                         <div class="highlight-achievement">
+                            <p><em data-lang-key="exp3Achievement">Exemplo de Conquista (Adicionar se aplicável): As otimizações de campanha propostas e implementadas geraram uma poupança de X% no orçamento, mantendo/aumentando os níveis de performance.</em></p>
+                        </div>
+                    </article>
+
+                    <article class="timeline-item">
+                        <h3 class="text-xl font-semibold text-secondary-accent" data-lang-key="exp4Title">Media Coordinator (Cliente: Amazon Prime Video)</h3>
+                        <p class="text-md font-medium text-gray-400" data-lang-key="exp4Company">Mediabrands Brasil (RUFUS) | São Paulo, Brasil (Híbrido)</p>
+                        <p class="text-sm text-gray-500 mb-2" data-lang-key="exp4Date">Junho 2021 – Novembro 2022 (1 ano e 6 meses)</p>
+                        <ul class="list-disc list-inside text-gray-300 space-y-1">
+                            <li data-lang-key="exp4Resp1">Monitorização diária do desempenho de campanhas em Google Ads, Facebook Ads, Twitter Ads, TikTok Ads.</li>
+                            <li data-lang-key="exp4Resp2">Preparação de relatórios de desempenho de campanhas, com sugestões de otimização, gestão e distribuição de investimento.</li>
+                            <li data-lang-key="exp4Resp3">Criação, implementação e reporte de novos planos de media.</li>
+                            <li data-lang-key="exp4Resp4">Controlo de faturação e emissão de PI/AP no sistema AdSolutions.</li>
+                            <li data-lang-key="exp4Resp5">Participação em reuniões com veículos Digitais, OOH e TV.</li>
+                            <li data-lang-key="exp4Resp6">Comunicação direta com o cliente para apresentação de planos e relatórios.</li>
+                        </ul>
+                    </article>
+
+                    <article class="timeline-item">
+                        <h3 class="text-xl font-semibold text-secondary-accent" data-lang-key="exp5Title">Media Coordinator</h3>
+                        <p class="text-md font-medium text-gray-400" data-lang-key="exp5Company">DM9 (OMNICOM GROUP) | São Paulo, Brasil (Híbrido)</p>
+                        <p class="text-sm text-gray-500 mb-2" data-lang-key="exp5Date">Março 2021 – Junho 2021 (4 meses)</p>
+                        <p class="text-gray-300 mb-1"><strong data-lang-key="clientsLabel">Clientes:</strong> Dr. Oetker, MRV Engenharia.</p>
+                        <ul class="list-disc list-inside text-gray-300 space-y-1">
+                            <li data-lang-key="exp5Resp1">Execução de planeamento de media e simulação de planos em ferramentas (Facebook Ads, Google Ads, Twitter Ads).</li>
+                            <li data-lang-key="exp5Resp2">Coordenação da operação com AdServers e desenvolvimento de estratégias de comunicação para clientes.</li>
+                            <li data-lang-key="exp5Resp3">Atendimento a veículos e fornecedores, procurando oportunidades de media.</li>
+                            <li data-lang-key="exp5Resp4">Preparação de Relatórios de Desempenho de Campanhas e assistência no levantamento de oportunidades para planeamento.</li>
+                            <li data-lang-key="exp5Resp5">Desenvolvimento de programação de TV/outros media e simulação de programação.</li>
+                            <li data-lang-key="exp5Resp6">Análise de desempenho de campanhas/patrocínios e eficácia da media.</li>
+                            <li data-lang-key="exp5Resp7">Preparação/atualização de cronogramas de media e controlo de saldos de pacotes e adiantamentos.</li>
+                            <li data-lang-key="exp5Resp8">Geração de relatórios de investimento gerenciais e delegação/monitorização das atividades dos AdServers.</li>
+                        </ul>
+                    </article>
+
+                     <article class="timeline-item">
+                        <h3 class="text-xl font-semibold text-secondary-accent" data-lang-key="exp6Title">Media Assistant</h3>
+                        <p class="text-md font-medium text-gray-400" data-lang-key="exp6Company">R/GA (INTERPUBLIC GROUP) | São Paulo, Brasil (Híbrido)</p>
+                        <p class="text-sm text-gray-500 mb-2" data-lang-key="exp6Date">Outubro 2019 – Março 2021 (1 ano e 6 meses)</p>
+                        <p class="text-gray-300 mb-1"><strong data-lang-key="clientsLabel">Clientes:</strong> next, Ágora Investimentos, Bradesco.</p>
+                        <ul class="list-disc list-inside text-gray-300 space-y-1">
+                            <li data-lang-key="exp6Resp1">Negociação e contacto direto com veículos.</li>
+                            <li data-lang-key="exp6Resp2">Preparação e planeamento de campanhas.</li>
+                            <li data-lang-key="exp6Resp3">Monitorização diária do desempenho de campanhas em Google Ads, Facebook Ads e LinkedIn.</li>
+                            <li data-lang-key="exp6Resp4">Preparação de relatórios de desempenho de campanhas, com sugestões de otimização, gestão e distribuição de investimento.</li>
+                            <li data-lang-key="exp6Resp5">Planeamento de investimento, estruturação e implementação de novas campanhas.</li>
+                            <li data-lang-key="exp6Resp6">Controlo de faturação e emissão de PIs no sistema AdSolutions.</li>
+                            <li data-lang-key="exp6Resp7">Experiência e certificação em Google Ads, Google Marketing Platform (DV360 e Campaign Manager), Twitter Ads, Facebook Ads e LinkedIn Ads.</li>
+                        </ul>
+                    </article>
+
+                    <article class="timeline-item">
+                        <h3 class="text-xl font-semibold text-secondary-accent" data-lang-key="exp7Title">Media Assistant</h3>
+                        <p class="text-md font-medium text-gray-400" data-lang-key="exp7Company">dentsu | São Paulo, Brasil</p>
+                        <p class="text-sm text-gray-500 mb-2" data-lang-key="exp7Date">Agosto 2019 – Outubro 2019 (3 meses)</p>
+                        <p class="text-gray-300 mb-1"><strong data-lang-key="clientsLabel">Clientes:</strong> Special Dog, Diamond Films, Burberry, United Airlines, Unicef.</p>
+                        <ul class="list-disc list-inside text-gray-300 space-y-1">
+                            <li data-lang-key="exp7Resp1">Preparação de relatórios de desempenho de campanhas.</li>
+                            <li data-lang-key="exp7Resp2">Emissão de PIs e controlo de faturação.</li>
+                            <li data-lang-key="exp7Resp3">Participação em reuniões com clientes e veículos.</li>
+                        </ul>
+                    </article>
+
+                    <article class="timeline-item">
+                        <h3 class="text-xl font-semibold text-secondary-accent" data-lang-key="exp8Title">Media Assistant</h3>
+                        <p class="text-md font-medium text-gray-400" data-lang-key="exp8Company">Reprise Digital (IPG MEDIABRANDS) | São Paulo, Brasil</p>
+                        <p class="text-sm text-gray-500 mb-2" data-lang-key="exp8Date">Março 2019 – Agosto 2019 (6 meses)</p>
+                        <p class="text-gray-300 mb-1"><strong data-lang-key="clientsLabel">Clientes:</strong> Mastercard, Mattel, Rappi, BIC, Netsuite, Estée Lauder (E-commerce e Marcas: MAC, Clinique, Jo Malone, La Mer, Tom Ford).</p>
+                        <ul class="list-disc list-inside text-gray-300 space-y-1">
+                            <li data-lang-key="exp8Resp1">Monitorização diária do desempenho de campanhas em Google Ads, Facebook Ads e LinkedIn.</li>
+                            <li data-lang-key="exp8Resp2">Preparação de relatórios de desempenho de campanhas, com sugestões de otimização, gestão e distribuição de investimento.</li>
+                            <li data-lang-key="exp8Resp3">Planeamento de investimento, estruturação e implementação de novas campanhas.</li>
+                            <li data-lang-key="exp8Resp4">Controlo de faturação e emissão de PI/AP no sistema AdSolutions.</li>
+                            <li data-lang-key="exp8Resp5">Participação em reuniões com veículos e preparação de planos de media.</li>
+                        </ul>
+                    </article>
+
+                    <article class="timeline-item">
+                        <h3 class="text-xl font-semibold text-secondary-accent" data-lang-key="exp9Title">Media Intern</h3>
+                        <p class="text-md font-medium text-gray-400" data-lang-key="exp9Company">Reprise Digital (IPG MEDIABRANDS) | São Paulo, Brasil</p>
+                        <p class="text-sm text-gray-500 mb-2" data-lang-key="exp9Date">Maio 2018 – Março 2019 (11 meses)</p>
+                        <p class="text-gray-300 mb-1"><strong data-lang-key="clientsLabel">Clientes:</strong> Ri Happy, Accenture, Western Union, Canal Viva, Mattel.</p>
+                        <ul class="list-disc list-inside text-gray-300 space-y-1">
+                            <li data-lang-key="exp9Resp1">Monitorização diária do desempenho de campanhas em Google Ads, Facebook Ads e LinkedIn.</li>
+                            <li data-lang-key="exp9Resp2">Preparação de relatórios de desempenho de campanhas, com sugestões de otimização, gestão e distribuição de investimento.</li>
+                            <li data-lang-key="exp9Resp3">Estruturação e implementação de novas campanhas.</li>
+                            <li data-lang-key="exp9Resp4">Controlo de faturação e emissão de PI/AP no sistema AdSolutions.</li>
+                            <li data-lang-key="exp9Resp5">Participação em reuniões com veículos.</li>
+                        </ul>
+                    </article>
+                </div>
+            </section>
+
+            <section id="formacao" class="mb-12 sm:mb-16 pt-16 -mt-16">
+                <h2 class="text-3xl font-bold section-title mb-8" data-lang-key="educationSectionTitle">Formação Académica</h2>
+                <div class="card p-6 rounded-lg">
+                    <h3 class="text-xl font-semibold text-secondary-accent" data-lang-key="educationDegree">Bacharelato em Publicidade e Marketing</h3>
+                    <p class="text-md font-medium text-gray-400" data-lang-key="educationInstitution">Faculdade Cásper Líbero | São Paulo, Brasil</p>
+                    <p class="text-sm text-gray-500" data-lang-key="educationDate">Janeiro 2017 – Dezembro 2020</p>
+                </div>
+            </section>
+
+            <section id="competencias" class="mb-12 sm:mb-16 pt-16 -mt-16">
+                <h2 class="text-3xl font-bold section-title mb-8" data-lang-key="skillsSectionTitle">Competências</h2>
+                
+                <div class="grid md:grid-cols-2 gap-8 mb-8">
+                    <div class="card p-6 rounded-lg">
+                        <h3 class="text-xl font-semibold text-secondary-accent mb-4" data-lang-key="topSkillsTitle">Top Skills (Competências Principais)</h3>
+                        <ul class="list-disc list-inside text-gray-300 space-y-1">
+                            <li data-lang-key="topSkill1">Gestão de Produção de Media (Media Production Management)</li>
+                            <li data-lang-key="topSkill2">Geração de Procura (Demand Generation)</li>
+                            <li data-lang-key="topSkill3">Marketing Digital</li>
+                        </ul>
+                    </div>
+                    <div class="card p-6 rounded-lg">
+                        <h3 class="text-xl font-semibold text-secondary-accent mb-4" data-lang-key="languagesTitle">Idiomas</h3>
+                        <div class="space-y-3">
+                            <div>
+                                <p class="text-gray-300 font-medium" data-lang-key="languagePT">Português</p>
+                                <div class="skill-bar-container mt-1"><div class="skill-bar" style="width: 100%;" data-lang-key="languagePTLevel">Nativo (ou Bilingue)</div></div>
+                            </div>
+                            <div>
+                                <p class="text-gray-300 font-medium" data-lang-key="languageEN">Inglês</p>
+                                <div class="skill-bar-container mt-1"><div class="skill-bar" style="width: 90%;" data-lang-key="languageENLevel">Profissional Completo (C1)</div></div>
+                                <p class="text-xs text-gray-500 mt-1"><em data-lang-key="languageENCertificate">Certificado [Nome do Certificado, se houver]</em></p>
+                            </div>
+                            <div>
+                                <p class="text-gray-300 font-medium" data-lang-key="languageES">Espanhol</p>
+                                <div class="skill-bar-container mt-1"><div class="skill-bar" style="width: 65%;" data-lang-key="languageESLevel">Profissional Limitado (B1)</div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card p-6 rounded-lg mb-8">
+                    <h3 class="text-xl font-semibold text-secondary-accent mb-4" data-lang-key="hardSkillsTitle">Competências Técnicas (Hard Skills)</h3>
+                    <ul class="list-disc list-inside text-gray-300 space-y-1 columns-1 md:columns-2">
+                        <li data-lang-key="hardSkill1">**Plataformas de Media Paga:** Google Ads (Search, Display, YouTube), Google Marketing Platform (DV360, Campaign Manager), Meta Ads Manager, Twitter Ads, TikTok Ads Manager, LinkedIn Campaign Manager, Amazon Advertising (Sponsored Products, Brands, Display), Xandr.</li>
+                        <li data-lang-key="hardSkill2">**Analytics & Reporting:** Google Analytics (GA4), Adobe Analytics (Básico), Supermetrics, Google Data Studio/Looker Studio, Excel Avançado (Tabelas Dinâmicas, Power Query).</li>
+                        <li data-lang-key="hardSkill3">**Marketplaces:** Amazon Seller Central/Vendor Central, Walmart Ads, Instacart Ads.</li>
+                        <li data-lang-key="hardSkill4">**Outras Ferramentas:** Comscore, Kantar IBOPE Media, Trello, Asana, Jira, Slack, AdSolutions.</li>
+                        <li data-lang-key="hardSkill5">**Metodologias:** Agile Marketing (Básico).</li>
+                    </ul>
+                </div>
+
+                <div class="card p-6 rounded-lg mb-8">
+                    <h3 class="text-xl font-semibold text-secondary-accent mb-4" data-lang-key="softSkillsTitle">Competências Comportamentais (Soft Skills)</h3>
+                    <ul class="list-disc list-inside text-gray-300 space-y-1 columns-1 md:columns-2">
+                        <li data-lang-key="softSkill1">Liderança de Equipas</li>
+                        <li data-lang-key="softSkill2">Pensamento Estratégico</li>
+                        <li data-lang-key="softSkill3">Gestão de Projetos</li>
+                        <li data-lang-key="softSkill4">Comunicação Interpessoal e Apresentações</li>
+                        <li data-lang-key="softSkill5">Resolução de Problemas</li>
+                        <li data-lang-key="softSkill6">Adaptabilidade e Proatividade</li>
+                        <li data-lang-key="softSkill7">Atenção ao Detalhe</li>
+                        <li data-lang-key="softSkill8">Gestão de Tempo e Priorização</li>
+                        <li data-lang-key="softSkill9">Delegação de Tarefas</li>
+                    </ul>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="card p-6 rounded-lg">
+                        <h3 class="text-xl font-semibold text-secondary-accent mb-4" data-lang-key="certificationsTitle">Certificações</h3>
+                        <ul class="list-disc list-inside text-gray-300 space-y-1">
+                            <li data-lang-key="certification1">Meta Certified Media Buying Professional</li>
+                            <li><em data-lang-key="certification2Placeholder">[Outra Certificação, se houver] – [Entidade Emissora] – [Ano]</em></li>
+                        </ul>
+                    </div>
+                    <div class="card p-6 rounded-lg">
+                        <h3 class="text-xl font-semibold text-secondary-accent mb-4"><span data-lang-key="interestsTitle">Interesses</span> <span class="text-sm text-gray-500" data-lang-key="optionalLabel">(Opcional)</span></h3>
+                         <ul class="list-disc list-inside text-gray-300 space-y-1">
+                            <li><em data-lang-key="interestsPlaceholder">[Mencionar 2-3 interesses que possam ser relevantes ou demonstrar personalidade, e.g., Novas Tecnologias de Media, Análise de Dados de Consumidor, Fotografia]</em></li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <section id="contacto" class="pt-16 -mt-16">
+                <h2 class="text-3xl font-bold section-title mb-8 text-center" data-lang-key="contactSectionTitle">Contacto</h2>
+                <div class="card p-6 md:p-8 rounded-lg text-center">
+                    <p class="text-lg sm:text-xl text-gray-300 mb-2" data-lang-key="contactIntro1">Interessado em discutir oportunidades ou saber mais?</p>
+                    <p class="text-md sm:text-lg text-gray-400 mb-6" data-lang-key="contactIntro2">Entre em contacto!</p>
+                    <a href="mailto:danielribas97@gmail.com" class="inline-block bg-blue-600 text-white font-semibold py-3 px-6 sm:px-8 rounded-lg hover:bg-blue-700 transition duration-300 text-md sm:text-lg">
+                        <span class="icon-placeholder">📧</span> <span data-lang-key="contactSendEmail">Enviar Email</span>
+                    </a>
+                    <div class="mt-8 text-gray-400 space-y-2">
+                        <p><span class="icon-placeholder">🔗</span> <a href="https://linkedin.com/in/danielgribas" target="_blank" rel="noopener noreferrer" class="hover:text-blue-400">linkedin.com/in/danielgribas</a></p>
+                        <p><span class="icon-placeholder">📞</span> +351 916 833 745</p>
+                        <p><span class="icon-placeholder">📍</span> <span data-lang-key="contactLocation">Lisboa, Portugal</span></p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="text-center py-8 mt-12 border-t border-separator">
+            <p class="text-muted">&copy; <span id="currentYear"></span> <span data-lang-key="footerCopyrightName">Daniel Gotlieb Ribas</span>. <span data-lang-key="footerRights">Todos os direitos reservados.</span></p>
+        </footer>
+    </div>
+
+    <script>
+        const translations = {
+            en: {
+                pageTitle: "Interactive CV - Daniel Gotlieb Ribas",
+                modalTitle: "Select Your Language",
+                headerName: "Daniel Gotlieb Ribas",
+                navProfile: "Profile",
+                navExperience: "Experience",
+                navEducation: "Education",
+                navSkills: "Skills",
+                navContact: "Contact",
+                navProfileMobile: "Profile",
+                navExperienceMobile: "Experience",
+                navEducationMobile: "Education",
+                navSkillsMobile: "Skills",
+                navContactMobile: "Contact",
+                mainTitleName: "DANIEL GOTLIEB RIBAS",
+                mainTitleRole: "Digital Marketing Specialist",
+                profileSectionTitle: "Professional Profile",
+                profileSummary: "With consolidated experience in various industry sectors, I specialize in creating and planning new media paths, managing campaigns, and delivering media reports and presentations. I have proven skills in social, display, video advertising platforms, TV buying, and related areas. Additionally, I am capable of optimizing results and creating efficient processes, both internally and for clients. As a team leader, I possess excellent task delegation skills. Throughout my career, I have achieved outstanding results aligned with client objectives.",
+                experienceSectionTitle: "Professional Experience",
+                expKeyResponsibilities: "Key Responsibilities:",
+                clientsLabel: "Clients:",
+                exp1Title: "Digital Media Supervisor",
+                exp1Company: "KINESSO (IPG MEDIABRANDS) | Lisbon, Portugal (Hybrid)",
+                exp1Date: "October 2024 – Present (Approx. 8 months as of May 2025)",
+                exp1Description: "Leading a team of campaign executives, driving digital success for a diverse portfolio of renowned clients, including Super Bock Group, Intermarché, Bricomarché, Roady, H&M, and Amazon.",
+                exp1Resp1: "**Strategic Planning:** Developing and implementing innovative digital strategies to achieve client objectives and maximize ROI.",
+                exp1Resp2: "**Client Relationship Management:** Cultivating strong relationships with key stakeholders, providing strategic counsel, and identifying new business opportunities.",
+                exp1Resp3: "**Team Leadership:** Mentoring and guiding a high-performing team, fostering a collaborative and results-oriented environment.",
+                exp1Resp4: "**Performance Optimization:** Analyzing campaign performance, identifying areas for improvement, and implementing optimization strategies to enhance efficiency and effectiveness.",
+                exp1Resp5: "**Financial Management:** Overseeing client billing and ensuring accurate financial reporting.",
+                exp1Achievement: "Example of Achievement (Add if applicable): Implementation of new segmentation strategies that resulted in an X% increase in CTR and a Y% reduction in CPA for client Z.",
+                exp2Title: "Marketplaces Specialist",
+                exp2Company: "Quartile | New York, USA (Remote)",
+                exp2Date: "May 2024 – October 2024 (6 months)",
+                exp2Resp1: "Optimization of campaigns on marketplaces like Walmart Ads and Instacart Ads for US retail clients, using a data-driven approach and AI expertise to achieve maximum ROAS and profitability.",
+                exp2Resp2: "Development and implementation of strategies to drive successful advertising campaigns.",
+                exp2Resp3: "Utilization of analytical skills to track and measure campaign performance.",
+                exp2Resp4: "Collaboration with cross-functional teams to ensure campaign success.",
+                exp2Achievement: "Example of Achievement (Add if applicable): Achieved an average improvement of X% in Return On Ad Spend (ROAS) for clients in category Y.",
+                exp3Title: "Media Supervisor (Client: Amazon Prime Video)",
+                exp3Company: "Mediabrands Brasil (RUFUS) | São Paulo, Brazil (Hybrid)",
+                exp3Date: "November 2022 – May 2024 (1 year and 7 months)",
+                exp3Resp1: "Led a team of a coordinator and an assistant, overseeing the tactical execution of campaigns.",
+                exp3Resp2: "Daily monitoring of the performance of Google Ads, Facebook Ads, Twitter Ads, TikTok Ads campaigns.",
+                exp3Resp3: "Preparation of campaign performance reports, with suggestions for optimization, management, and investment distribution.",
+                exp3Resp4: "Creation, implementation, and reporting of new media plans.",
+                exp3Resp5: "Control of billing and PI/AP issuance in the AdSolutions system.",
+                exp3Resp6: "Participation in meetings with Digital, OOH, and TV media vehicles.",
+                exp3Resp7: "Direct communication with the client to present plans and reports.",
+                exp3Achievement: "Example of Achievement (Add if applicable): Proposed and implemented campaign optimizations that generated X% budget savings while maintaining/increasing performance levels.",
+                exp4Title: "Media Coordinator (Client: Amazon Prime Video)",
+                exp4Company: "Mediabrands Brasil (RUFUS) | São Paulo, Brazil (Hybrid)",
+                exp4Date: "June 2021 – November 2022 (1 year and 6 months)",
+                exp4Resp1: "Daily monitoring of the performance of Google Ads, Facebook Ads, Twitter Ads, TikTok Ads campaigns.",
+                exp4Resp2: "Preparation of campaign performance reports, with suggestions for optimization, management, and investment distribution.",
+                exp4Resp3: "Creation, implementation, and reporting of new media plans.",
+                exp4Resp4: "Control of billing and PI/AP issuance in the AdSolutions system.",
+                exp4Resp5: "Participation in meetings with Digital, OOH, and TV media vehicles.",
+                exp4Resp6: "Direct communication with the client to present plans and reports.",
+                exp5Title: "Media Coordinator",
+                exp5Company: "DM9 (OMNICOM GROUP) | São Paulo, Brazil (Hybrid)",
+                exp5Date: "March 2021 – June 2021 (4 months)",
+                exp5Resp1: "Execution of media planning and simulation of plans in tools (Facebook Ads, Google Ads, Twitter Ads).",
+                exp5Resp2: "Coordination of operations with AdServers and development of communication strategies for clients.",
+                exp5Resp3: "Servicing media vehicles and suppliers, seeking media opportunities.",
+                exp5Resp4: "Preparation of Campaign Performance Reports and assistance in identifying planning opportunities.",
+                exp5Resp5: "Development of TV/other media programming and programming simulation.",
+                exp5Resp6: "Analysis of campaign/sponsorship performance and media effectiveness.",
+                exp5Resp7: "Preparation/updating of media schedules and control of package balances and advance payments.",
+                exp5Resp8: "Generation of managerial investment reports and delegation/monitoring of AdServer activities.",
+                exp6Title: "Media Assistant",
+                exp6Company: "R/GA (INTERPUBLIC GROUP) | São Paulo, Brazil (Hybrid)",
+                exp6Date: "October 2019 – March 2021 (1 year and 6 months)",
+                exp6Resp1: "Negotiation and direct contact with media vehicles.",
+                exp6Resp2: "Preparation and planning of campaigns.",
+                exp6Resp3: "Daily monitoring of the performance of Google Ads, Facebook Ads, and LinkedIn campaigns.",
+                exp6Resp4: "Preparation of campaign performance reports, with suggestions for optimization, management, and investment distribution.",
+                exp6Resp5: "Investment planning, structuring, and implementation of new campaigns.",
+                exp6Resp6: "Billing control and issuance of PIs in the AdSolutions system.",
+                exp6Resp7: "Experience and certification in Google Ads, Google Marketing Platform (DV360 and Campaign Manager), Twitter Ads, Facebook Ads, and LinkedIn Ads.",
+                exp7Title: "Media Assistant",
+                exp7Company: "dentsu | São Paulo, Brazil",
+                exp7Date: "August 2019 – October 2019 (3 months)",
+                exp7Resp1: "Preparation of campaign performance reports.",
+                exp7Resp2: "Issuance of PIs and billing control.",
+                exp7Resp3: "Participation in meetings with customers and media vehicles.",
+                exp8Title: "Media Assistant",
+                exp8Company: "Reprise Digital (IPG MEDIABRANDS) | São Paulo, Brazil",
+                exp8Date: "March 2019 – August 2019 (6 months)",
+                exp8Resp1: "Daily monitoring of the performance of Google Ads, Facebook Ads, and LinkedIn campaigns.",
+                exp8Resp2: "Preparation of campaign performance reports, with suggestions for optimization, management, and investment distribution.",
+                exp8Resp3: "Investment planning, structuring, and implementation of new campaigns.",
+                exp8Resp4: "Control of billing and PI/AP issuance in the AdSolutions system.",
+                exp8Resp5: "Participation in meetings with media vehicles and preparation of media plans.",
+                exp9Title: "Media Intern",
+                exp9Company: "Reprise Digital (IPG MEDIABRANDS) | São Paulo, Brazil",
+                exp9Date: "May 2018 – March 2019 (11 months)",
+                exp9Resp1: "Daily monitoring of the performance of Google Ads, Facebook Ads, and LinkedIn campaigns.",
+                exp9Resp2: "Preparation of campaign performance reports, with suggestions for optimization, management, and investment distribution.",
+                exp9Resp3: "Structuring and implementation of new campaigns.",
+                exp9Resp4: "Control of billing and PI/AP issuance in the AdSolutions system.",
+                exp9Resp5: "Participation in meetings with media vehicles.",
+                educationSectionTitle: "Education",
+                educationDegree: "Bachelor's Degree in Advertising and Marketing",
+                educationInstitution: "Faculdade Cásper Líbero | São Paulo, Brazil",
+                educationDate: "January 2017 – December 2020",
+                skillsSectionTitle: "Skills",
+                topSkillsTitle: "Top Skills",
+                topSkill1: "Media Production Management",
+                topSkill2: "Demand Generation",
+                topSkill3: "Digital Marketing",
+                languagesTitle: "Languages",
+                languagePT: "Portuguese",
+                languagePTLevel: "Native (or Bilingual)",
+                languageEN: "English",
+                languageENLevel: "Full Professional (C1)",
+                languageENCertificate: "Certificate [Name of Certificate, if any]",
+                languageES: "Spanish",
+                languageESLevel: "Limited Working (B1)",
+                hardSkillsTitle: "Technical Skills (Hard Skills)",
+                hardSkill1: "**Paid Media Platforms:** Google Ads (Search, Display, YouTube), Google Marketing Platform (DV360, Campaign Manager), Meta Ads Manager, Twitter Ads, TikTok Ads Manager, LinkedIn Campaign Manager, Amazon Advertising (Sponsored Products, Brands, Display), Xandr.",
+                hardSkill2: "**Analytics & Reporting:** Google Analytics (GA4), Adobe Analytics (Basic), Supermetrics, Google Data Studio/Looker Studio, Advanced Excel (Pivot Tables, Power Query).",
+                hardSkill3: "**Marketplaces:** Amazon Seller Central/Vendor Central, Walmart Ads, Instacart Ads.",
+                hardSkill4: "**Other Tools:** Comscore, Kantar IBOPE Media, Trello, Asana, Jira, Slack, AdSolutions.",
+                hardSkill5: "**Methodologies:** Agile Marketing (Basic).",
+                softSkillsTitle: "Behavioral Skills (Soft Skills)",
+                softSkill1: "Team Leadership",
+                softSkill2: "Strategic Thinking",
+                softSkill3: "Project Management",
+                softSkill4: "Interpersonal Communication and Presentations",
+                softSkill5: "Problem Solving",
+                softSkill6: "Adaptability and Proactivity",
+                softSkill7: "Attention to Detail",
+                softSkill8: "Time Management and Prioritization",
+                softSkill9: "Task Delegation",
+                certificationsTitle: "Certifications",
+                certification1: "Meta Certified Media Buying Professional",
+                certification2Placeholder: "[Other Certification, if any] – [Issuing Entity] – [Year]",
+                interestsTitle: "Interests",
+                optionalLabel: "(Optional)",
+                interestsPlaceholder: "[Mention 2-3 interests that may be relevant or demonstrate personality, e.g., New Media Technologies, Consumer Data Analysis, Photography]",
+                contactSectionTitle: "Contact",
+                contactIntro1: "Interested in discussing opportunities or learning more?",
+                contactIntro2: "Get in touch!",
+                contactSendEmail: "Send Email",
+                contactLocation: "Lisbon, Portugal",
+                footerCopyrightName: "Daniel Gotlieb Ribas",
+                footerRights: "All rights reserved."
+            },
+            pt: { // Português (Portugal)
+                pageTitle: "CV Interativo - Daniel Gotlieb Ribas",
+                modalTitle: "Selecione o seu Idioma",
+                headerName: "Daniel Gotlieb Ribas",
+                navProfile: "Perfil",
+                navExperience: "Experiência",
+                navEducation: "Formação",
+                navSkills: "Competências",
+                navContact: "Contacto",
+                navProfileMobile: "Perfil",
+                navExperienceMobile: "Experiência",
+                navEducationMobile: "Formação",
+                navSkillsMobile: "Competências",
+                navContactMobile: "Contacto",
+                mainTitleName: "DANIEL GOTLIEB RIBAS",
+                mainTitleRole: "Especialista em Marketing Digital",
+                profileSectionTitle: "Perfil Profissional",
+                profileSummary: "Com experiência consolidada em diversos setores da indústria, sou especialista na criação e planeamento estratégico de media, gestão de campanhas multicanal e na elaboração de relatórios e apresentações de performance. Possuo competências comprovadas em plataformas de publicidade social (Meta Ads, TikTok Ads, LinkedIn Ads), display (Google Display Network), vídeo (YouTube Ads), compra de TV programática e tradicional, e otimização para motores de busca (SEO/SEM). Sou proficiente na otimização de resultados com foco em ROI e na criação de processos eficientes, tanto para equipas internas como para clientes. Como líder, destaco-me pela capacidade de delegação eficaz e desenvolvimento de equipas. Ao longo da minha carreira, tenho consistentemente superado as metas e objetivos dos clientes.",
+                experienceSectionTitle: "Experiência Profissional",
+                expKeyResponsibilities: "Principais Responsabilidades:",
+                clientsLabel: "Clientes:",
+                exp1Title: "Digital Media Supervisor",
+                exp1Company: "KINESSO (IPG MEDIABRANDS) | Lisboa, Portugal (Híbrido)",
+                exp1Date: "Outubro 2024 – Presente (Aprox. 8 meses à data de Maio 2025)",
+                exp1Description: "Liderança de uma equipa de executivos de campanha, impulsionando o sucesso digital para um portfólio diversificado de clientes de renome, incluindo Super Bock Group, Intermarché, Bricomarché, Roady, H&M e Amazon.",
+                exp1Resp1: "**Planeamento Estratégico:** Desenvolvimento e implementação de estratégias digitais inovadoras para alcançar os objetivos dos clientes e maximizar o ROI.",
+                exp1Resp2: "**Gestão de Relacionamento com o Cliente:** Cultivo de relações sólidas com stakeholders chave, fornecendo aconselhamento estratégico e identificando novas oportunidades de negócio.",
+                exp1Resp3: "**Liderança de Equipa:** Mentoria e orientação de uma equipa de alta performance, fomentando um ambiente colaborativo e orientado para resultados.",
+                exp1Resp4: "**Otimização de Performance:** Análise do desempenho de campanhas, identificação de áreas de melhoria e implementação de estratégias de otimização para aumentar a eficiência e eficácia.",
+                exp1Resp5: "**Gestão Financeira:** Supervisão da faturação dos clientes e garantia da precisão dos relatórios financeiros.",
+                exp1Achievement: "Exemplo de Conquista (Adicionar se aplicável): Implementação de novas estratégias de segmentação que resultaram num aumento de X% no CTR e redução de Y% no CPA para o cliente Z.",
+                exp2Title: "Marketplaces Specialist",
+                exp2Company: "Quartile | New York, USA (Remoto)",
+                exp2Date: "Maio 2024 – Outubro 2024 (6 meses)",
+                exp2Resp1: "Otimização de campanhas em marketplaces como Walmart Ads e Instacart Ads para clientes de retalho nos EUA, utilizando uma abordagem orientada por dados e expertise em IA para alcançar o máximo ROAS e rentabilidade.",
+                exp2Resp2: "Desenvolvimento e implementação de estratégias para impulsionar campanhas publicitárias de sucesso.",
+                exp2Resp3: "Utilização de competências analíticas para acompanhar e medir o desempenho das campanhas.",
+                exp2Resp4: "Colaboração com equipas multifuncionais para garantir o sucesso das campanhas.",
+                exp2Achievement: "Exemplo de Conquista (Adicionar se aplicável): Alcancei uma melhoria média de X% no Retorno Sobre o Investimento Publicitário (ROAS) para clientes da categoria Y.",
+                exp3Title: "Media Supervisor (Cliente: Amazon Prime Video)",
+                exp3Company: "Mediabrands Brasil (RUFUS) | São Paulo, Brasil (Híbrido)",
+                exp3Date: "Novembro 2022 – Maio 2024 (1 ano e 7 meses)",
+                exp3Resp1: "Liderei uma equipa de um coordenador e um assistente, supervisionando a execução tática das campanhas.",
+                exp3Resp2: "Monitorização diária do desempenho de campanhas em Google Ads, Facebook Ads, Twitter Ads, TikTok Ads.",
+                exp3Resp3: "Preparação de relatórios de desempenho de campanhas, com sugestões de otimização, gestão e distribuição de investimento.",
+                exp3Resp4: "Criação, implementação e reporte de novos planos de media.",
+                exp3Resp5: "Controlo de faturação e emissão de PI/AP no sistema AdSolutions.",
+                exp3Resp6: "Participação em reuniões com veículos Digitais, OOH e TV.",
+                exp3Resp7: "Comunicação direta com o cliente para apresentação de planos e relatórios.",
+                exp3Achievement: "Exemplo de Conquista (Adicionar se aplicável): As otimizações de campanha propostas e implementadas geraram uma poupança de X% no orçamento, mantendo/aumentando os níveis de performance.",
+                exp4Title: "Media Coordinator (Cliente: Amazon Prime Video)",
+                exp4Company: "Mediabrands Brasil (RUFUS) | São Paulo, Brasil (Híbrido)",
+                exp4Date: "Junho 2021 – Novembro 2022 (1 ano e 6 meses)",
+                exp4Resp1: "Monitorização diária do desempenho de campanhas em Google Ads, Facebook Ads, Twitter Ads, TikTok Ads.",
+                exp4Resp2: "Preparação de relatórios de desempenho de campanhas, com sugestões de otimização, gestão e distribuição de investimento.",
+                exp4Resp3: "Criação, implementação e reporte de novos planos de media.",
+                exp4Resp4: "Controlo de faturação e emissão de PI/AP no sistema AdSolutions.",
+                exp4Resp5: "Participação em reuniões com veículos Digitais, OOH e TV.",
+                exp4Resp6: "Comunicação direta com o cliente para apresentação de planos e relatórios.",
+                exp5Title: "Media Coordinator",
+                exp5Company: "DM9 (OMNICOM GROUP) | São Paulo, Brasil (Híbrido)",
+                exp5Date: "Março 2021 – Junho 2021 (4 meses)",
+                exp5Resp1: "Execução de planeamento de media e simulação de planos em ferramentas (Facebook Ads, Google Ads, Twitter Ads).",
+                exp5Resp2: "Coordenação da operação com AdServers e desenvolvimento de estratégias de comunicação para clientes.",
+                exp5Resp3: "Atendimento a veículos e fornecedores, procurando oportunidades de media.",
+                exp5Resp4: "Preparação de Relatórios de Desempenho de Campanhas e assistência no levantamento de oportunidades para planeamento.",
+                exp5Resp5: "Desenvolvimento de programação de TV/outros media e simulação de programação.",
+                exp5Resp6: "Análise de desempenho de campanhas/patrocínios e eficácia da media.",
+                exp5Resp7: "Preparação/atualização de cronogramas de media e controlo de saldos de pacotes e adiantamentos.",
+                exp5Resp8: "Geração de relatórios de investimento gerenciais e delegação/monitorização das atividades dos AdServers.",
+                exp6Title: "Media Assistant",
+                exp6Company: "R/GA (INTERPUBLIC GROUP) | São Paulo, Brasil (Híbrido)",
+                exp6Date: "Outubro 2019 – Março 2021 (1 ano e 6 meses)",
+                exp6Resp1: "Negociação e contacto direto com veículos.",
+                exp6Resp2: "Preparação e planeamento de campanhas.",
+                exp6Resp3: "Monitorização diária do desempenho de campanhas em Google Ads, Facebook Ads e LinkedIn.",
+                exp6Resp4: "Preparação de relatórios de desempenho de campanhas, com sugestões de otimização, gestão e distribuição de investimento.",
+                exp6Resp5: "Planeamento de investimento, estruturação e implementação de novas campanhas.",
+                exp6Resp6: "Controlo de faturação e emissão de PIs no sistema AdSolutions.",
+                exp6Resp7: "Experiência e certificação em Google Ads, Google Marketing Platform (DV360 e Campaign Manager), Twitter Ads, Facebook Ads e LinkedIn Ads.",
+                exp7Title: "Media Assistant",
+                exp7Company: "dentsu | São Paulo, Brasil",
+                exp7Date: "Agosto 2019 – Outubro 2019 (3 meses)",
+                exp7Resp1: "Preparação de relatórios de desempenho de campanhas.",
+                exp7Resp2: "Emissão de PIs e controlo de faturação.",
+                exp7Resp3: "Participação em reuniões com clientes e veículos.",
+                exp8Title: "Media Assistant",
+                exp8Company: "Reprise Digital (IPG MEDIABRANDS) | São Paulo, Brasil",
+                exp8Date: "Março 2019 – Agosto 2019 (6 meses)",
+                exp8Resp1: "Monitorização diária do desempenho de campanhas em Google Ads, Facebook Ads e LinkedIn.",
+                exp8Resp2: "Preparação de relatórios de desempenho de campanhas, com sugestões de otimização, gestão e distribuição de investimento.",
+                exp8Resp3: "Planeamento de investimento, estruturação e implementação de novas campanhas.",
+                exp8Resp4: "Controlo de faturação e emissão de PI/AP no sistema AdSolutions.",
+                exp8Resp5: "Participação em reuniões com veículos e preparação de planos de media.",
+                exp9Title: "Media Intern",
+                exp9Company: "Reprise Digital (IPG MEDIABRANDS) | São Paulo, Brasil",
+                exp9Date: "Maio 2018 – Março 2019 (11 meses)",
+                exp9Resp1: "Monitorização diária do desempenho de campanhas em Google Ads, Facebook Ads e LinkedIn.",
+                exp9Resp2: "Preparação de relatórios de desempenho de campanhas, com sugestões de otimização, gestão e distribuição de investimento.",
+                exp9Resp3: "Estruturação e implementação de novas campanhas.",
+                exp9Resp4: "Controlo de faturação e emissão de PI/AP no sistema AdSolutions.",
+                exp9Resp5: "Participação em reuniões com veículos.",
+                educationSectionTitle: "Formação Académica",
+                educationDegree: "Bacharelato em Publicidade e Marketing",
+                educationInstitution: "Faculdade Cásper Líbero | São Paulo, Brasil",
+                educationDate: "Janeiro 2017 – Dezembro 2020",
+                skillsSectionTitle: "Competências",
+                topSkillsTitle: "Top Skills (Competências Principais)",
+                topSkill1: "Gestão de Produção de Media",
+                topSkill2: "Geração de Procura",
+                topSkill3: "Marketing Digital",
+                languagesTitle: "Idiomas",
+                languagePT: "Português",
+                languagePTLevel: "Nativo (ou Bilingue)",
+                languageEN: "Inglês",
+                languageENLevel: "Profissional Completo (C1)",
+                languageENCertificate: "Certificado [Nome do Certificado, se houver]",
+                languageES: "Espanhol",
+                languageESLevel: "Profissional Limitado (B1)",
+                hardSkillsTitle: "Competências Técnicas (Hard Skills)",
+                hardSkill1: "**Plataformas de Media Paga:** Google Ads (Search, Display, YouTube), Google Marketing Platform (DV360, Campaign Manager), Meta Ads Manager, Twitter Ads, TikTok Ads Manager, LinkedIn Campaign Manager, Amazon Advertising (Sponsored Products, Brands, Display), Xandr.",
+                hardSkill2: "**Analytics & Reporting:** Google Analytics (GA4), Adobe Analytics (Básico), Supermetrics, Google Data Studio/Looker Studio, Excel Avançado (Tabelas Dinâmicas, Power Query).",
+                hardSkill3: "**Marketplaces:** Amazon Seller Central/Vendor Central, Walmart Ads, Instacart Ads.",
+                hardSkill4: "**Outras Ferramentas:** Comscore, Kantar IBOPE Media, Trello, Asana, Jira, Slack, AdSolutions.",
+                hardSkill5: "**Metodologias:** Agile Marketing (Básico).",
+                softSkillsTitle: "Competências Comportamentais (Soft Skills)",
+                softSkill1: "Liderança de Equipas",
+                softSkill2: "Pensamento Estratégico",
+                softSkill3: "Gestão de Projetos",
+                softSkill4: "Comunicação Interpessoal e Apresentações",
+                softSkill5: "Resolução de Problemas",
+                softSkill6: "Adaptabilidade e Proatividade",
+                softSkill7: "Atenção ao Detalhe",
+                softSkill8: "Gestão de Tempo e Priorização",
+                softSkill9: "Delegação de Tarefas",
+                certificationsTitle: "Certificações",
+                certification1: "Meta Certified Media Buying Professional",
+                certification2Placeholder: "[Outra Certificação, se houver] – [Entidade Emissora] – [Ano]",
+                interestsTitle: "Interesses",
+                optionalLabel: "(Opcional)",
+                interestsPlaceholder: "[Mencionar 2-3 interesses que possam ser relevantes ou demonstrar personalidade, e.g., Novas Tecnologias de Media, Análise de Dados de Consumidor, Fotografia]",
+                contactSectionTitle: "Contacto",
+                contactIntro1: "Interessado em discutir oportunidades ou saber mais?",
+                contactIntro2: "Entre em contacto!",
+                contactSendEmail: "Enviar Email",
+                contactLocation: "Lisboa, Portugal",
+                footerCopyrightName: "Daniel Gotlieb Ribas",
+                footerRights: "Todos os direitos reservados."
+            },
+            es: {
+                pageTitle: "CV Interactivo - Daniel Gotlieb Ribas",
+                modalTitle: "Seleccione su Idioma",
+                headerName: "Daniel Gotlieb Ribas",
+                navProfile: "Perfil",
+                navExperience: "Experiencia",
+                navEducation: "Formación",
+                navSkills: "Habilidades",
+                navContact: "Contacto",
+                navProfileMobile: "Perfil",
+                navExperienceMobile: "Experiencia",
+                navEducationMobile: "Formación",
+                navSkillsMobile: "Habilidades",
+                navContactMobile: "Contacto",
+                mainTitleName: "DANIEL GOTLIEB RIBAS",
+                mainTitleRole: "Especialista en Marketing Digital",
+                profileSectionTitle: "Perfil Profesional",
+                profileSummary: "Con experiencia consolidada en diversos sectores de la industria, me especializo en la creación y planificación de nuevas vías de medios, gestión de campañas y entrega de informes y presentaciones de medios. Poseo habilidades comprobadas en plataformas de publicidad social, display, video, compra de TV y áreas relacionadas. Adicionalmente, soy capaz de optimizar resultados y crear procesos eficientes, tanto interna como externamente para los clientes. Como líder de equipo, poseo excelentes habilidades de delegación de tareas. A lo largo de mi carrera, he logrado resultados sobresalientes alineados con los objetivos de los clientes.",
+                experienceSectionTitle: "Experiencia Profesional",
+                expKeyResponsibilities: "Responsabilidades Principales:",
+                clientsLabel: "Clientes:",
+                exp1Title: "Supervisor de Medios Digitales",
+                exp1Company: "KINESSO (IPG MEDIABRANDS) | Lisboa, Portugal (Híbrido)",
+                exp1Date: "Octubre 2024 – Actual (Aprox. 8 meses a fecha de Mayo 2025)",
+                exp1Description: "Liderando un equipo de ejecutivos de campaña, impulsando el éxito digital para una diversa cartera de clientes de renombre, incluyendo Super Bock Group, Intermarché, Bricomarché, Roady, H&M y Amazon.",
+                exp1Resp1: "**Planificación Estratégica:** Desarrollo e implementación de estrategias digitales innovadoras para alcanzar los objetivos de los clientes y maximizar el ROI.",
+                exp1Resp2: "**Gestión de Relaciones con el Cliente:** Cultivo de relaciones sólidas con stakeholders clave, proporcionando asesoramiento estratégico e identificando nuevas oportunidades de negocio.",
+                exp1Resp3: "**Liderazgo de Equipo:** Mentoría y orientación de un equipo de alto rendimiento, fomentando un ambiente colaborativo y orientado a resultados.",
+                exp1Resp4: "**Optimización del Rendimiento:** Análisis del rendimiento de las campañas, identificación de áreas de mejora e implementación de estrategias de optimización para mejorar la eficiencia y la eficacia.",
+                exp1Resp5: "**Gestión Financiera:** Supervisión de la facturación de los clientes y garantía de la precisión de los informes financieros.",
+                exp1Achievement: "Ejemplo de Logro (Añadir si aplica): Implementación de nuevas estrategias de segmentación que resultaron en un aumento del X% en el CTR y una reducción del Y% en el CPA para el cliente Z.",
+                exp2Title: "Especialista en Marketplaces",
+                exp2Company: "Quartile | Nueva York, EE. UU. (Remoto)",
+                exp2Date: "Mayo 2024 – Octubre 2024 (6 meses)",
+                exp2Resp1: "Optimización de campañas en marketplaces como Walmart Ads e Instacart Ads para clientes minoristas de EE. UU., utilizando un enfoque basado en datos y experiencia en IA para alcanzar el máximo ROAS y rentabilidad.",
+                exp2Resp2: "Desarrollo e implementación de estrategias para impulsar campañas publicitarias exitosas.",
+                exp2Resp3: "Utilización de habilidades analíticas para rastrear y medir el rendimiento de las campañas.",
+                exp2Resp4: "Colaboración con equipos multifuncionales para asegurar el éxito de las campañas.",
+                exp2Achievement: "Ejemplo de Logro (Añadir si aplica): Logré una mejora promedio del X% en el Retorno de la Inversión Publicitaria (ROAS) para clientes de la categoría Y.",
+                exp3Title: "Supervisor de Medios (Cliente: Amazon Prime Video)",
+                exp3Company: "Mediabrands Brasil (RUFUS) | São Paulo, Brasil (Híbrido)",
+                exp3Date: "Noviembre 2022 – Mayo 2024 (1 año y 7 meses)",
+                exp3Resp1: "Lideré un equipo de un coordinador y un asistente, supervisando la ejecución táctica de las campañas.",
+                exp3Resp2: "Monitorización diaria del rendimiento de campañas en Google Ads, Facebook Ads, Twitter Ads, TikTok Ads.",
+                exp3Resp3: "Preparación de informes de rendimiento de campañas, con sugerencias de optimización, gestión y distribución de la inversión.",
+                exp3Resp4: "Creación, implementación y reporte de nuevos planes de medios.",
+                exp3Resp5: "Control de facturación y emisión de PI/AP en el sistema AdSolutions.",
+                exp3Resp6: "Participación en reuniones con vehículos de medios Digitales, OOH y TV.",
+                exp3Resp7: "Comunicación directa con el cliente para presentar planes e informes.",
+                exp3Achievement: "Ejemplo de Logro (Añadir si aplica): Las optimizaciones de campaña propuestas e implementadas generaron un ahorro del X% en el presupuesto, manteniendo/aumentando los niveles de rendimiento.",
+                exp4Title: "Coordinador de Medios (Cliente: Amazon Prime Video)",
+                exp4Company: "Mediabrands Brasil (RUFUS) | São Paulo, Brasil (Híbrido)",
+                exp4Date: "Junio 2021 – Noviembre 2022 (1 año y 6 meses)",
+                exp4Resp1: "Monitorización diaria del rendimiento de campañas en Google Ads, Facebook Ads, Twitter Ads, TikTok Ads.",
+                exp4Resp2: "Preparación de informes de rendimiento de campañas, con sugerencias de optimización, gestión y distribución de la inversión.",
+                exp4Resp3: "Creación, implementación y reporte de nuevos planes de medios.",
+                exp4Resp4: "Control de facturación y emisión de PI/AP en el sistema AdSolutions.",
+                exp4Resp5: "Participación en reuniones con vehículos de medios Digitales, OOH y TV.",
+                exp4Resp6: "Comunicación directa con el cliente para presentar planes e informes.",
+                exp5Title: "Coordinador de Medios",
+                exp5Company: "DM9 (OMNICOM GROUP) | São Paulo, Brasil (Híbrido)",
+                exp5Date: "Marzo 2021 – Junio 2021 (4 meses)",
+                exp5Resp1: "Ejecución de planificación de medios y simulación de planes en herramientas (Facebook Ads, Google Ads, Twitter Ads).",
+                exp5Resp2: "Coordinación de la operación con AdServers y desarrollo de estrategias de comunicación para clientes.",
+                exp5Resp3: "Atención a vehículos y proveedores, buscando oportunidades de medios.",
+                exp5Resp4: "Preparación de Informes de Rendimiento de Campañas y asistencia en la identificación de oportunidades de planificación.",
+                exp5Resp5: "Desarrollo de programación de TV/otros medios y simulación de programación.",
+                exp5Resp6: "Análisis del rendimiento de campañas/patrocinios y efectividad de los medios.",
+                exp5Resp7: "Preparación/actualización de cronogramas de medios y control de saldos de paquetes y pagos anticipados.",
+                exp5Resp8: "Generación de informes de inversión gerenciales y delegación/monitorización de las actividades de los AdServers.",
+                exp6Title: "Asistente de Medios",
+                exp6Company: "R/GA (INTERPUBLIC GROUP) | São Paulo, Brasil (Híbrido)",
+                exp6Date: "Octubre 2019 – Marzo 2021 (1 año y 6 meses)",
+                exp6Resp1: "Negociación y contacto directo con vehículos de medios.",
+                exp6Resp2: "Preparación y planificación de campañas.",
+                exp6Resp3: "Monitorización diaria del rendimiento de campañas en Google Ads, Facebook Ads y LinkedIn.",
+                exp6Resp4: "Preparación de informes de rendimiento de campañas, con sugerencias de optimización, gestión y distribución de la inversión.",
+                exp6Resp5: "Planificación de inversiones, estructuración e implementación de nuevas campañas.",
+                exp6Resp6: "Control de facturación y emisión de PIs en el sistema AdSolutions.",
+                exp6Resp7: "Experiencia y certificación en Google Ads, Google Marketing Platform (DV360 y Campaign Manager), Twitter Ads, Facebook Ads y LinkedIn Ads.",
+                exp7Title: "Asistente de Medios",
+                exp7Company: "dentsu | São Paulo, Brasil",
+                exp7Date: "Agosto 2019 – Octubre 2019 (3 meses)",
+                exp7Resp1: "Preparación de informes de rendimiento de campañas.",
+                exp7Resp2: "Emisión de PIs y control de facturación.",
+                exp7Resp3: "Participación en reuniones con clientes y vehículos de medios.",
+                exp8Title: "Asistente de Medios",
+                exp8Company: "Reprise Digital (IPG MEDIABRANDS) | São Paulo, Brasil",
+                exp8Date: "Marzo 2019 – Agosto 2019 (6 meses)",
+                exp8Resp1: "Monitorización diaria del rendimiento de campañas en Google Ads, Facebook Ads y LinkedIn.",
+                exp8Resp2: "Preparación de informes de rendimiento de campañas, con sugerencias de optimización, gestión y distribución de la inversión.",
+                exp8Resp3: "Planificación de inversiones, estructuración e implementación de nuevas campañas.",
+                exp8Resp4: "Control de facturación y emisión de PI/AP en el sistema AdSolutions.",
+                exp8Resp5: "Participación en reuniones con vehículos de medios y preparación de planes de medios.",
+                exp9Title: "Becario de Medios",
+                exp9Company: "Reprise Digital (IPG MEDIABRANDS) | São Paulo, Brasil",
+                exp9Date: "Mayo 2018 – Marzo 2019 (11 meses)",
+                exp9Resp1: "Monitorización diaria del rendimiento de campañas en Google Ads, Facebook Ads y LinkedIn.",
+                exp9Resp2: "Preparación de informes de rendimiento de campañas, con sugerencias de optimización, gestão e distribuição de investimento.",
+                exp9Resp3: "Estructuración e implementación de nuevas campañas.",
+                exp9Resp4: "Control de facturación y emisión de PI/AP en el sistema AdSolutions.",
+                exp9Resp5: "Participación en reuniones con vehículos de medios.",
+                educationSectionTitle: "Formación Académica",
+                educationDegree: "Licenciatura en Publicidad y Marketing",
+                educationInstitution: "Faculdade Cásper Líbero | São Paulo, Brasil",
+                educationDate: "Enero 2017 – Diciembre 2020",
+                skillsSectionTitle: "Habilidades",
+                topSkillsTitle: "Habilidades Principales",
+                topSkill1: "Gestión de Producción de Medios",
+                topSkill2: "Generación de Demanda",
+                topSkill3: "Marketing Digital",
+                languagesTitle: "Idiomas",
+                languagePT: "Portugués",
+                languagePTLevel: "Nativo (o Bilingüe)",
+                languageEN: "Inglés",
+                languageENLevel: "Profesional Completo (C1)",
+                languageENCertificate: "Certificado [Nombre del Certificado, si existe]",
+                languageES: "Español",
+                languageESLevel: "Profesional Limitado (B1)",
+                hardSkillsTitle: "Habilidades Técnicas (Hard Skills)",
+                hardSkill1: "**Plataformas de Medios Pagados:** Google Ads (Search, Display, YouTube), Google Marketing Platform (DV360, Campaign Manager), Meta Ads Manager, Twitter Ads, TikTok Ads Manager, LinkedIn Campaign Manager, Amazon Advertising (Sponsored Products, Brands, Display), Xandr.",
+                hardSkill2: "**Analítica e Informes:** Google Analytics (GA4), Adobe Analytics (Básico), Supermetrics, Google Data Studio/Looker Studio, Excel Avanzado (Tablas Dinámicas, Power Query).",
+                hardSkill3: "**Marketplaces:** Amazon Seller Central/Vendor Central, Walmart Ads, Instacart Ads.",
+                hardSkill4: "**Otras Herramientas:** Comscore, Kantar IBOPE Media, Trello, Asana, Jira, Slack, AdSolutions.",
+                hardSkill5: "**Metodologías:** Agile Marketing (Básico).",
+                softSkillsTitle: "Habilidades Interpersonales (Soft Skills)",
+                softSkill1: "Liderazgo de Equipos",
+                softSkill2: "Pensamiento Estratégico",
+                softSkill3: "Gestión de Proyectos",
+                softSkill4: "Comunicación Interpersonal y Presentaciones",
+                softSkill5: "Resolución de Problemas",
+                softSkill6: "Adaptabilidad y Proactividad",
+                softSkill7: "Atención al Detalle",
+                softSkill8: "Gestión del Tiempo y Priorización",
+                softSkill9: "Delegación de Tareas",
+                certificationsTitle: "Certificaciones",
+                certification1: "Meta Certified Media Buying Professional",
+                certification2Placeholder: "[Otra Certificación, si existe] – [Entidad Emisora] – [Año]",
+                interestsTitle: "Intereses",
+                optionalLabel: "(Opcional)",
+                interestsPlaceholder: "[Mencionar 2-3 intereses que puedan ser relevantes o demostrar personalidad, ej., Nuevas Tecnologías de Medios, Análisis de Datos del Consumidor, Fotografía]",
+                contactSectionTitle: "Contacto",
+                contactIntro1: "¿Interesado en discutir oportunidades o saber más?",
+                contactIntro2: "¡Póngase en contacto!",
+                contactSendEmail: "Enviar Correo Electrónico",
+                contactLocation: "Lisboa, Portugal",
+                footerCopyrightName: "Daniel Gotlieb Ribas",
+                footerRights: "Todos los derechos reservados."
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const langModalOverlay = document.getElementById('language-modal-overlay');
+            const mainCvContent = document.getElementById('main-cv-content');
+            langModalOverlay.classList.add('active'); // Show modal on load
+
+            const langButtons = langModalOverlay.querySelectorAll('button[data-lang]');
+            
+            langButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const selectedLang = button.getAttribute('data-lang');
+                    setLanguage(selectedLang);
+                    langModalOverlay.classList.remove('active');
+                    mainCvContent.style.display = 'block';
+                     // Re-initialize scrollspy after content is visible and language is set
+                    setTimeout(changeNavOnScroll, 100); 
+                });
+            });
+
+            document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            if(mobileMenuButton && mobileMenu){
+                mobileMenuButton.addEventListener('click', () => {
+                    mobileMenu.classList.toggle('hidden');
+                });
+            }
+
+            document.querySelectorAll('#mobile-menu a, header nav a.nav-link').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    if (link.closest('#mobile-menu')) {
+                        if(mobileMenu) mobileMenu.classList.add('hidden');
+                    }
+                    const targetId = link.getAttribute('href');
+                    if (targetId && targetId.startsWith('#')) {
+                        e.preventDefault();
+                        const targetElement = document.querySelector(targetId);
+                        if (targetElement) {
+                             targetElement.scrollIntoView({
+                                 behavior: 'smooth',
+                                 block: 'start' 
+                             });
+                        }
+                    }
+                });
+            });
+            
+            window.addEventListener('scroll', changeNavOnScroll);
+            // Initial check is deferred until language is set and content visible
+        });
+
+        function setLanguage(lang) {
+            document.documentElement.lang = lang === 'pt' ? 'pt-PT' : lang; // Set html lang attribute
+            const elementsToTranslate = document.querySelectorAll('[data-lang-key]');
+            elementsToTranslate.forEach(element => {
+                const key = element.getAttribute('data-lang-key');
+                if (translations[lang] && translations[lang][key]) {
+                    // For elements that might contain HTML like bold tags, use innerHTML
+                    // For simple text, textContent is safer. Heuristic: if text includes '**' it might be markdown-like bold.
+                    if ( (key.includes('Resp') && translations[lang][key].includes('**')) || key === 'hardSkill1' ) { // Example keys that might have bold
+                         element.innerHTML = translations[lang][key].replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                    } else {
+                        element.textContent = translations[lang][key];
+                    }
+                }
+            });
+            // Update page title separately
+            document.title = translations[lang]?.pageTitle || "Interactive CV - Daniel Gotlieb Ribas";
+        }
+        
+        const navLinks = document.querySelectorAll('header nav a.nav-link, #mobile-menu a.nav-link');
+        const sections = document.querySelectorAll('main section');
+
+        function changeNavOnScroll() {
+            if (document.getElementById('main-cv-content').style.display === 'none') return; // Don't run if content not visible
+
+            let index = sections.length;
+            const header = document.querySelector('header');
+            const headerHeight = header ? header.offsetHeight + 20 : 80; 
+
+            while(--index >= 0 && window.scrollY + headerHeight < sections[index].offsetTop) {}
+            
+            navLinks.forEach((link) => link.classList.remove('active'));
+            
+            if(index >=0 ) { 
+                const activeSectionId = sections[index].id;
+                navLinks.forEach(link => {
+                    if (link.getAttribute('href') === `#${activeSectionId}`) {
+                        link.classList.add('active');
+                    }
+                });
+            }
+        }
+    </script>
+
+</body>
+</html>
